@@ -36,14 +36,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <nav>
     <div class="logo">Marcus Grant</div>
     <ul>
-      <li><a href="#about">About</a></li>
-      <li><a href="#highlights">Highlights</a></li>
-      <li><a href="#experience">Experience</a></li>
-      <li><a href="#portfolio">Portfolio</a></li>
-      <li><a href="#consulting">Consulting</a></li>
-      <li><a href="#resume">Resume</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
+    <li><a href="#about" onclick="gtag('event','nav_click',{section:'about'})">About</a></li>
+    <li><a href="#highlights" onclick="gtag('event','nav_click',{section:'highlights'})">Highlights</a></li>
+    <li><a href="#experience" onclick="gtag('event','nav_click',{section:'experience'})">Experience</a></li>
+    <li><a href="#portfolio" onclick="gtag('event','nav_click',{section:'portfolio'})">Portfolio</a></li>
+    <li><a href="#consulting" onclick="gtag('event','nav_click',{section:'consulting'})">Consulting</a></li>
+    <li><a href="#resume" onclick="gtag('event','nav_click',{section:'resume'})">Resume</a></li>
+    <li><a href="#contact" onclick="gtag('event','nav_click',{section:'contact'})">Contact</a></li>
+  </ul>
   </nav>
 
   <!-- Hero -->
@@ -66,7 +66,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <span class="badge">Growth Analytics</span>
         </div>
         <div class="hero-ctas">
-          <a href="resume/Marcus_Grant_Resume.pdf" class="btn btn-primary" download>Download Resume</a>
+          <a href="resume/Marcus_Grant_Resume.pdf" class="btn btn-primary" download onclick="gtag('event','resume_download',{location:'hero'})">Download Resume</a>
           <a href="#about" class="btn btn-outline">Learn More</a>
         </div>
       </div>
@@ -319,7 +319,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <h3>Marcus Grant — Full Resume</h3>
           <p>Analytics leadership, AI/ML, growth strategy, and military service — complete work history and credentials.</p>
         </div>
-        <a href="resume/Marcus_Grant_Resume.pdf" class="btn btn-primary" download>
+        <a href="resume/Marcus_Grant_Resume.pdf" class="btn btn-primary" download onclick="gtag('event','resume_download',{location:'resume_section'})">Download PDF</a>
           Download PDF
         </a>
       </div>
