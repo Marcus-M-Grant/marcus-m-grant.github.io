@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-K6M3DPH6');</script>
+  <!-- End Google Tag Manager -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bids — Bids&Tenders</title>
+  <style>
+    /* ── Reset & Base ────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 14px;
+      color: #333333;
+      background: #ffffff;
+    }
+
+    a { color: #2E7D6B; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Buttons ─────────────────────────────── */
+    .btn-teal {
+      background: #2E7D6B;
+      color: #ffffff;
+      border: none;
+      padding: 7px 16px;
+      font-size: 13px;
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      line-height: 1.4;
+    }
+    .btn-teal:hover:not(:disabled) { background: #1B5E50; }
+    .btn-teal:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-teal-sm {
+      background: #2E7D6B;
+      color: #ffffff;
+      border: none;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-family: Arial, sans-serif;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+    .btn-teal-sm:hover { background: #1B5E50; }
+
+    .btn-outline-sm {
+      background: #ffffff;
+      color: #2E7D6B;
+      border: 1px solid #2E7D6B;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-family: Arial, sans-serif;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+    .btn-outline-sm:hover { background: #f0f8f6; }
+
+    /* ── Loading Overlay ──────────────────────── */
+    #loading {
+      position: fixed; inset: 0;
+      background: rgba(255,255,255,0.88);
+      display: none; align-items: center; justify-content: center;
+      z-index: 9000; flex-direction: column; gap: 12px;
+    }
+    #loading.active { display: flex; }
+
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid #dddddd;
+      border-top-color: #2E7D6B;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading-text { color: #555555; font-size: 13px; }
+
+    /* ── Skeleton ────────────────────────────── */
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position:  400px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+      background-size: 400px 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    /* ── Password Gate ───────────────────────── */
+    #gate {
+      position: fixed; inset: 0;
+      background: #f0f8f6;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 8000;
+    }
+    #gate.hidden { display: none; }
+
+    .gate-card {
+      background: #ffffff;
+      border: 1px solid #cccccc;
+      padding: 36px 40px;
+      width: 100%; max-width: 380px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .gate-input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #cccccc;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 10px;
+      margin-top: 18px;
+    }
+    .gate-input:focus { border-color: #2E7D6B; }
+    .gate-error { color: #C0392B; font-size: 12px; margin-bottom: 6px; min-height: 16px; }
+
+    /* ── Modal overlay ───────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none; align-items: center; justify-content: center;
+      z-index: 5000; padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal-card {
+      background: #ffffff;
+      border: 1px solid #cccccc;
+      padding: 26px 30px;
+      width: 100%; max-width: 600px;
+      max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    .modal-hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #2E7D6B;
+    }
+    .modal-hdr h2 { font-size: 1.05rem; font-weight: bold; color: #1B5E50; }
+
+    .modal-close {
+      background: none; border: none;
+      font-size: 18px; cursor: pointer; color: #888; padding: 2px 6px; line-height: 1;
+    }
+    .modal-close:hover { color: #333; }
+
+    /* Form inside modals */
+    .form-group { margin-bottom: 13px; }
+    .form-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 3px; }
+    .form-ctrl {
+      width: 100%; padding: 7px 10px;
+      border: 1px solid #cccccc;
+      font-family: Arial, sans-serif; font-size: 13px; outline: none;
+    }
+    .form-ctrl:focus { border-color: #2E7D6B; }
+    textarea.form-ctrl { resize: vertical; }
+    select.form-ctrl { background: #ffffff; }
+
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-row-2 .form-group { margin-bottom: 0; }
+    .hint-text  { font-size: 11px; color: #888; margin-top: 3px; }
+    .form-divider { border: none; border-top: 1px solid #eeeeee; margin: 16px 0; }
+    .slabel { font-size: 11px; font-weight: bold; text-transform: uppercase; color: #888; letter-spacing: 0.06em; display: block; margin-bottom: 8px; }
+    .add-doc-btn { color: #2E7D6B; font-size: 12px; cursor: pointer; background: none; border: none; font-family: Arial, sans-serif; padding: 0; margin-bottom: 12px; }
+    .add-doc-btn:hover { text-decoration: underline; }
+    .form-error  { color: #C0392B; font-size: 12px; margin-top: 4px; min-height: 16px; }
+
+    /* ── Main Page ───────────────────────────── */
+    #main-page { display: none; }
+    #main-page.active { display: block; }
+
+    /* Setup banner */
+    #setup-banner {
+      display: none;
+      background: #fff8e1;
+      border-bottom: 1px solid #ffe082;
+      padding: 7px 20px;
+      font-size: 13px; color: #555;
+    }
+    #setup-banner.show { display: block; }
+
+    /* ── Page Header ─────────────────────────── */
+    .pg-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 10px 20px 8px;
+      border-bottom: 1px solid #eeeeee;
+    }
+
+    /* ── Nav Bar ─────────────────────────────── */
+    .pg-nav {
+      border-top: 1px solid #cccccc;
+      border-bottom: 1px solid #cccccc;
+      padding: 0 20px;
+      background: #ffffff;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0;
+      min-height: 36px;
+    }
+    .pg-nav a {
+      color: #2E7D6B;
+      font-size: 13px;
+      padding: 9px 0;
+      display: inline-block;
+    }
+    .pg-nav .sep { color: #cccccc; margin: 0 8px; user-select: none; }
+    .pg-nav a.active { font-weight: bold; text-decoration: underline; }
+
+    /* ── Content wrapper ─────────────────────── */
+    .pg-content { max-width: 1000px; padding: 0 20px 40px; }
+
+    /* Page title row */
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 16px 0 10px;
+    }
+    .title-row h1 { font-size: 1.5rem; font-weight: bold; margin-bottom: 6px; }
+    .title-row p  { color: #555555; font-size: 13px; line-height: 1.5; }
+
+    .section-divider { border: none; border-top: 1px solid #dddddd; margin: 0; }
+
+    .sec-h2 { font-size: 1.2rem; font-weight: bold; padding: 16px 0 8px; color: #222222; }
+
+    /* ── AI Recommendations Section ──────────── */
+    #ai-section {
+      margin: 12px 0 20px;
+      padding: 14px 16px;
+      background: #f0f8f6;
+      border-left: 4px solid #2E7D6B;
+    }
+
+    .ai-hdr {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .ai-hdr-left  { display: flex; align-items: flex-start; flex-direction: column; gap: 3px; }
+    .ai-hdr-title { display: flex; align-items: center; gap: 8px; }
+
+    .ai-title    { font-size: 1rem; font-weight: bold; color: #1B5E50; }
+    .ai-subtitle { font-size: 12px; color: #666666; }
+
+    .ai-badge {
+      background: #2E7D6B; color: #ffffff;
+      font-size: 9px; padding: 2px 6px; border-radius: 2px;
+      font-weight: bold; letter-spacing: 0.04em; white-space: nowrap;
+    }
+
+    .ai-hdr-right { display: flex; align-items: center; gap: 10px; }
+    .last-updated { font-size: 11px; color: #888888; white-space: nowrap; }
+
+    /* AI table */
+    .ai-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 13px;
+      border: 1px solid #dddddd;
+    }
+    .ai-table th {
+      padding: 8px 10px; text-align: left;
+      background: #e0eeeb;
+      border: 1px solid #cccccc;
+      font-weight: bold; font-size: 12px; color: #1B5E50;
+    }
+    .ai-table td {
+      padding: 9px 10px;
+      border: 1px solid #dddddd;
+      vertical-align: top;
+      background: #ffffff;
+    }
+    .ai-table tr:nth-child(even) td { background: #f9fdfc; }
+
+    .opp-name-link {
+      color: #2E7D6B; font-weight: bold; font-size: 13px;
+      cursor: pointer; border: none; background: none;
+      font-family: Arial, sans-serif; padding: 0; text-align: left;
+    }
+    .opp-name-link:hover { text-decoration: underline; }
+
+    .opp-agency { color: #888888; font-size: 11px; margin-top: 2px; }
+    .opp-bidnum { color: #aaaaaa; font-size: 11px; }
+
+    .score-large { font-size: 1.25rem; font-weight: bold; display: block; line-height: 1; }
+    .score-lbl   { font-size: 10px; color: #888888; display: block; margin-top: 1px; }
+    .sc-green { color: #2E7D6B; }
+    .sc-amber { color: #E6950A; }
+    .sc-red   { color: #C0392B; }
+
+    .win-signal { font-size: 12px; color: #555555; font-style: italic; line-height: 1.45; }
+
+    .close-date        { font-size: 13px; color: #333; }
+    .close-date.urgent { color: #C0392B; font-weight: bold; }
+
+    .ai-disclaimer { font-size: 11px; color: #888888; margin-top: 10px; }
+
+    .ai-empty {
+      padding: 14px;
+      background: #ffffff;
+      border: 1px solid #dddddd;
+      font-size: 13px; color: #555;
+      text-align: center;
+    }
+
+    /* Skeleton rows in AI table */
+    .skel-row td { background: #ffffff !important; }
+
+    /* ── Bid Submission Table ─────────────────── */
+    .data-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 13px;
+      border: 1px solid #dddddd;
+    }
+    .data-table th {
+      padding: 8px 10px; text-align: left;
+      background: #eeeeee;
+      border: 1px solid #dddddd;
+      font-weight: bold; font-size: 12px;
+    }
+    .data-table td {
+      padding: 8px 10px;
+      border: 1px solid #dddddd;
+      vertical-align: middle;
+    }
+    .data-table tbody tr:nth-child(4n+3) td,
+    .data-table tbody tr:nth-child(4n+4) td { background: #f9f9f9; }
+
+    .bid-link {
+      color: #2E7D6B; font-weight: bold;
+      cursor: pointer; border: none; background: none;
+      font-family: Arial, sans-serif; font-size: 13px; padding: 0; text-align: left;
+    }
+    .bid-link:hover { text-decoration: underline; }
+
+    .detail-row { display: none; }
+    .detail-row.open { display: table-row; }
+    .detail-cell {
+      background: #f0f8f6 !important;
+      padding: 12px 16px !important;
+    }
+    .detail-summary { color: #555; font-size: 13px; margin-bottom: 8px; line-height: 1.55; }
+    .kw-wrap { display: flex; flex-wrap: wrap; gap: 4px; }
+    .kw {
+      background: #d6ede8; color: #1B5E50;
+      padding: 2px 8px; font-size: 11px; border-radius: 2px; font-weight: 500;
+    }
+
+    .opill {
+      display: inline-block; padding: 2px 8px;
+      border-radius: 2px; font-size: 11px; font-weight: bold;
+    }
+    .op-won       { background: #d6ede8; color: #1B5E50; }
+    .op-lost      { background: #fde8e6; color: #C0392B; }
+    .op-submitted { background: #eeeeee; color: #555555; }
+    .op-pending   { background: #fff8e1; color: #E6950A; }
+
+    .add-bid-link {
+      color: #2E7D6B; font-size: 13px;
+      cursor: pointer; border: none; background: none;
+      font-family: Arial, sans-serif; padding: 0;
+      display: inline-block; margin-top: 10px;
+    }
+    .add-bid-link:hover { text-decoration: underline; }
+
+    /* ── Easy Apply Modal ────────────────────── */
+    #ea-modal {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: none; align-items: stretch; justify-content: center;
+      z-index: 6000;
+    }
+    #ea-modal.active { display: flex; }
+
+    .ea-wrap {
+      background: #ffffff;
+      width: 100%; max-width: 1000px;
+      margin: 0 auto;
+      display: flex; flex-direction: column;
+      height: 100vh; overflow: hidden;
+    }
+
+    .ea-hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 13px 20px;
+      border-bottom: 1px solid #dddddd;
+      background: #f0f8f6;
+      flex-shrink: 0;
+    }
+    .ea-hdr h2 { font-size: 1rem; font-weight: bold; color: #1B5E50; }
+
+    .ea-body {
+      display: grid; grid-template-columns: 1fr 1fr;
+      flex: 1; min-height: 0; overflow: hidden;
+    }
+
+    .ea-left {
+      padding: 20px;
+      border-right: 1px solid #dddddd;
+      overflow-y: auto;
+    }
+    .ea-right {
+      padding: 20px;
+      overflow-y: auto;
+      display: flex; flex-direction: column;
+    }
+
+    .ea-rfp-title { font-size: 1rem; font-weight: bold; color: #1B5E50; margin-bottom: 3px; }
+    .ea-rfp-meta  { font-size: 12px; color: #888888; margin-bottom: 14px; }
+
+    .ea-circles { display: flex; gap: 14px; margin-bottom: 14px; }
+
+    .metric-circ {
+      width: 86px; height: 86px; border-radius: 50%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; border: 3px solid;
+    }
+    .mc-green { border-color: #2E7D6B; background: #f0f8f6; color: #2E7D6B; }
+    .mc-amber { border-color: #E6950A; background: #fff8e1; color: #E6950A; }
+    .mc-red   { border-color: #C0392B; background: #fde8e6; color: #C0392B; }
+
+    .mc-val { font-size: 1.3rem; font-weight: bold; line-height: 1.1; display: block; }
+    .mc-lbl { font-size: 9px; color: #888888; margin-top: 1px; display: block; }
+
+    .ea-desc {
+      font-size: 12px; color: #555555; line-height: 1.65;
+      max-height: 300px; overflow-y: auto;
+      border: 1px solid #eeeeee; padding: 10px;
+      background: #fafafa; white-space: pre-wrap;
+      margin-bottom: 12px;
+    }
+
+    .ea-right-title { font-size: 0.95rem; font-weight: bold; color: #1B5E50; margin-bottom: 14px; }
+
+    .draft-spinner {
+      display: none; align-items: center; gap: 8px;
+      font-size: 13px; color: #555555; margin: 10px 0;
+    }
+    .draft-spinner.active { display: flex; }
+
+    .draft-box { display: none; flex-direction: column; }
+    .draft-box.active { display: flex; }
+
+    .draft-text {
+      font-size: 12px; line-height: 1.7; color: #333333;
+      white-space: pre-wrap;
+      background: #fafafa; border: 1px solid #dddddd;
+      padding: 14px; overflow-y: auto;
+      max-height: 360px; margin-bottom: 10px;
+    }
+
+    .draft-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .draft-error   { color: #C0392B; font-size: 12px; margin: 6px 0; }
+
+    /* ── Mobile ──────────────────────────────── */
+    @media (max-width: 700px) {
+      .ea-body { grid-template-columns: 1fr; overflow-y: auto; }
+      .ea-wrap { height: auto; overflow-y: auto; }
+      .ea-left { border-right: none; border-bottom: 1px solid #dddddd; }
+      .form-row-2 { grid-template-columns: 1fr; }
+      .pg-nav { overflow-x: auto; white-space: nowrap; }
+      .title-row { flex-direction: column; gap: 10px; }
+      .ai-hdr { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K6M3DPH6"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<!-- ════════════════════════════════════════════
+     GLOBAL LOADING OVERLAY
+════════════════════════════════════════════ -->
+<div id="loading">
+  <div class="spinner"></div>
+  <span id="loading-text">Loading…</span>
+</div>
+
+<!-- ════════════════════════════════════════════
+     UPLOAD BID MODAL
+════════════════════════════════════════════ -->
+<div class="modal-overlay" id="upload-modal">
+  <div class="modal-card" style="max-width:520px;">
+    <div class="modal-hdr">
+      <h2>Upload a Bid Document</h2>
+      <button class="modal-close" id="upload-close-btn">✕</button>
+    </div>
+    <div class="form-group">
+      <label>Bid Text</label>
+      <textarea id="upload-text" class="form-ctrl" rows="10"
+        placeholder="Paste the full text of a previous bid submission…"></textarea>
+    </div>
+    <div class="form-error" id="upload-error"></div>
+    <div style="display:flex; gap:8px; margin-top:4px;">
+      <button class="btn-teal" id="upload-submit-btn">Process &amp; Save</button>
+      <button class="btn-outline-sm" id="upload-cancel-btn" style="padding:7px 14px;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     EASY APPLY MODAL
+════════════════════════════════════════════ -->
+<div id="ea-modal">
+  <div class="ea-wrap">
+    <div class="ea-hdr">
+      <h2 id="ea-heading">Easy Apply</h2>
+      <button class="modal-close" id="ea-close-btn">✕</button>
+    </div>
+    <div class="ea-body">
+      <!-- Left: RFP Summary -->
+      <div class="ea-left">
+        <p class="ea-rfp-title" id="ea-title"></p>
+        <p class="ea-rfp-meta"  id="ea-meta"></p>
+        <div class="ea-circles">
+          <div class="metric-circ" id="ea-win-circle">
+            <span class="mc-val" id="ea-win-val"></span>
+            <span class="mc-lbl">Win Probability</span>
+          </div>
+          <div class="metric-circ" id="ea-cap-circle">
+            <span class="mc-val" id="ea-cap-val"></span>
+            <span class="mc-lbl">Capabilities Match</span>
+          </div>
+        </div>
+        <div style="margin-bottom:8px;" id="ea-pills"></div>
+        <p class="ea-desc" id="ea-desc"></p>
+        <a href="#" id="ea-source-link" target="_blank" rel="noopener noreferrer"
+           style="color:#2E7D6B; font-size:13px; font-weight:bold;">View original posting ↗</a>
+      </div>
+
+      <!-- Right: Draft Generator -->
+      <div class="ea-right">
+        <p class="ea-right-title">Generate Bid Draft</p>
+
+        <div id="draft-form">
+          <div class="form-group">
+            <label>Base on previous bid:</label>
+            <select id="draft-base-sel" class="form-ctrl"></select>
+          </div>
+          <div class="form-group">
+            <label>Instructions (optional)</label>
+            <textarea id="draft-instr" class="form-ctrl" rows="3"
+              placeholder="Generate a bid submission draft for this RFP based on my previous experience."></textarea>
+          </div>
+          <div class="draft-error" id="draft-error"></div>
+          <button class="btn-teal" id="gen-draft-btn">Generate Draft →</button>
+        </div>
+
+        <div class="draft-spinner" id="draft-spinner">
+          <div class="spinner" style="width:22px;height:22px;border-width:2px;"></div>
+          <span>Writing your draft proposal…</span>
+        </div>
+
+        <div class="draft-box" id="draft-box">
+          <div class="draft-text" id="draft-text"></div>
+          <div class="draft-actions">
+            <button class="btn-teal-sm" id="copy-draft-btn">Copy to clipboard</button>
+            <button class="btn-outline-sm" id="download-draft-btn">Download .txt</button>
+            <button class="btn-outline-sm" id="regen-btn">↺ Regenerate</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PASSWORD GATE
+════════════════════════════════════════════ -->
+<div id="gate">
+  <div class="gate-card">
+    <img src="https://ic9.esolg.ca/235250_BidsandTenders/en/resources/logos/BT_NewLogo_NameandSymol-colored.png"
+         height="48" alt="bids&tenders" style="margin-bottom:18px;">
+    <p style="font-size:15px;font-weight:bold;color:#1B5E50;margin-bottom:4px;">BidMatch</p>
+    <p style="font-size:12px;color:#555;margin-bottom:0;">Vendor Intelligence Dashboard</p>
+    <input id="pw-input" type="password" class="gate-input" placeholder="Enter password" autocomplete="current-password">
+    <div class="gate-error" id="pw-error"></div>
+    <button class="btn-teal" id="pw-btn" style="width:100%;justify-content:center;">Sign In</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     MAIN PAGE
+════════════════════════════════════════════ -->
+<div id="main-page">
+
+  <!-- Header -->
+  <div class="pg-header">
+    <a href="#"><img
+      src="https://ic9.esolg.ca/235250_BidsandTenders/en/resources/logos/BT_NewLogo_NameandSymol-colored.png"
+      height="55" alt="bids&tenders"></a>
+    <div style="text-align:right;">
+      <div style="margin-bottom:6px;">
+        <a href="#" style="color:#2E7D6B; font-size:13px;">Français</a>
+      </div>
+      <img src="https://bids.bidsandtenders.ca/Resources/content/StandardTemplate/resources/Logo/bids_and_tenders_logo-long-tm.svg"
+           height="28" alt="Bids and Tenders">
+    </div>
+  </div>
+
+  <!-- Nav Bar -->
+  <div class="pg-nav">
+    <a href="#" class="active">My Bids</a>
+    <span class="sep">|</span>
+    <a href="https://bids.bidsandtenders.ca/Module/Tenders/en/Home/BidsHomepage" target="_blank" rel="noopener">Bids Homepage</a>
+    <span class="sep">|</span>
+    <a href="#">Find more bids</a>
+    <span class="sep">|</span>
+    <a href="#">Shopping Cart (0)</a>
+    <span class="sep">|</span>
+    <a href="#">Manage Account</a>
+    <span class="sep">|</span>
+    <a href="#">Subscription</a>
+    <span class="sep">|</span>
+    <a href="#">Change Password</a>
+    <span class="sep">|</span>
+    <a href="#">Logout</a>
+  </div>
+
+  <!-- Setup banner (shown if profile dismissed) -->
+  <div id="setup-banner">
+    Complete your profile to unlock AI recommendations.
+    <a href="#" id="setup-now-link" style="color:#2E7D6B; font-weight:bold; margin-left:6px;">Set up now</a>
+  </div>
+
+  <!-- Content -->
+  <div class="pg-content">
+
+    <!-- Page title -->
+    <div class="title-row">
+      <div>
+        <h1>My Bids</h1>
+        <p>This area allows Bidders to manage all bids that they are registered as a plan taker for under this account.</p>
+      </div>
+      <div style="flex-shrink:0; padding-top:4px;">
+        <button class="btn-teal" onclick="window.open('https://bids.bidsandtenders.ca/Module/Tenders/en/Home/BidsHomepage','_blank')">
+          📋 All Bids
+        </button>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- ── AI Recommendations ── -->
+    <div id="ai-section">
+      <div class="ai-hdr">
+        <div class="ai-hdr-left">
+          <div class="ai-hdr-title">
+            <span style="font-size:1rem;">✨</span>
+            <span class="ai-title">Recommended Opportunities</span>
+            <span class="ai-badge">Powered by AI</span>
+          </div>
+          <span class="ai-subtitle">AI-matched RFPs based on your bid history and capabilities</span>
+        </div>
+        <div class="ai-hdr-right">
+          <span class="last-updated" id="last-updated-txt"></span>
+          <button class="btn-outline-sm" id="refresh-ai-btn">↻ Refresh</button>
+        </div>
+      </div>
+      <div id="ai-body"></div>
+      <p class="ai-disclaimer">Scores are generated by AI based on your uploaded bid history and company profile. Always review the full RFP before submitting.</p>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Invited To Bid -->
+    <h2 class="sec-h2">Invited To Bid</h2>
+    <p style="color:#333; font-size:13px; margin-bottom:16px;">There are no bids to display.</p>
+
+    <hr class="section-divider">
+
+    <!-- My Active Bids -->
+    <h2 class="sec-h2">My Active Bids</h2>
+    <p style="color:#333; font-size:13px; margin-bottom:16px;">There are no active bids to display.</p>
+
+    <hr class="section-divider">
+
+    <!-- Bid Submission History -->
+    <h2 class="sec-h2">Bid Submission History</h2>
+    <div id="bids-table-wrap"></div>
+    <button class="add-bid-link" id="add-bid-btn">+ Upload a bid document</button>
+
+  </div><!-- /pg-content -->
+</div><!-- /main-page -->
+
+<script>
+  /* ══════════════════════════════════════════════
+     CONFIG
+  ══════════════════════════════════════════════ */
+  const WORKER_URL = 'https://bidmatch-worker.grantmarcus245.workers.dev';
+  const CORRECT_PASSWORD = 'bidmatch2025';
+
+  const FALLBACK_URLS = [
+    'https://bids.bidsandtenders.ca/Module/Tenders/en/Tender/Detail/839b1cea-2487-4229-9031-03c1d0804121',
+    'https://bids.bidsandtenders.ca/Module/Tenders/en/Tender/Detail/edaa30b7-5d3c-41e8-9607-93de4001584f',
+    'https://bids.bidsandtenders.ca/Module/Tenders/en/Tender/Detail/f5e2343c-6ee6-4474-8a16-c1d3a84db8bb',
+    'https://bids.bidsandtenders.ca/Module/Tenders/en/Tender/Detail/3e8988a8-4225-41ee-952b-92a81b67cccb',
+    'https://bids.bidsandtenders.ca/Module/Tenders/en/Tender/Detail/02c5be9b-d1e6-40ff-a2d1-3a7f0207ff9a',
+  ];
+
+  /* ══════════════════════════════════════════════
+     SAMPLE BIDS
+  ══════════════════════════════════════════════ */
+  const SAMPLE_BIDS = [
+    {
+      id: 'bid-001',
+      title: 'Managed IT Services — Township of Clearwater',
+      agency: 'Township of Clearwater',
+      date: '2023-11-14', value: '$74,900',
+      outcome: 'won',
+      summary: 'Full Fortinet network deployment across 3 municipal facilities plus Microsoft 365 migration for 45 users.',
+      keywords: ['Fortinet', 'Microsoft 365', 'network infrastructure', 'municipal IT'],
+      docText: `Proposal for Managed IT Services submitted to the Township of Clearwater. Services included full Fortinet Next-Generation Firewall deployment across 3 municipal facilities, SD-WAN configuration, Microsoft 365 tenant migration for 45 staff including Exchange Online, Teams, and SharePoint. Provided 24/7 network monitoring with 4-hour on-site SLA response. Certifications held: Fortinet NSE 5, Microsoft 365 Certified Enterprise Administrator. Previous municipal references: Township of Ramara, Municipality of Seguin.`
+    },
+    {
+      id: 'bid-002',
+      title: 'Cybersecurity Assessment — North Bay Housing Authority',
+      agency: 'North Bay Housing Authority',
+      date: '2023-06-02', value: '$28,500',
+      outcome: 'won',
+      summary: 'Comprehensive cybersecurity audit, penetration testing, and remediation roadmap for housing authority infrastructure.',
+      keywords: ['cybersecurity', 'penetration testing', 'audit', 'remediation', 'CompTIA Security+'],
+      docText: `Proposal for Cybersecurity Assessment Services for North Bay Housing Authority. Scope included network vulnerability scanning, firewall rule review, Active Directory security audit, staff phishing simulation, and a prioritized remediation report. Certifications held: Fortinet NSE 5, CompTIA Security+, CompTIA CySA+. Timeline: 6 weeks from award.`
+    },
+    {
+      id: 'bid-003',
+      title: 'ERP Implementation Support — Municipality of French River',
+      agency: 'Municipality of French River',
+      date: '2022-09-18', value: '$112,000',
+      outcome: 'lost',
+      summary: 'Proposed implementation and training services for municipal ERP financial system modernization.',
+      keywords: ['ERP', 'financial system', 'implementation', 'training', 'municipal', 'data migration'],
+      docText: `Proposal for ERP Implementation Services for Municipality of French River. Included system configuration, data migration from legacy platform, training for 25 users, and 6-month post-go-live support. Previous ERP experience: Clearwater Township financial system, Georgian Bay Islands visitor management system.`
+    }
+  ];
+
+  /* ══════════════════════════════════════════════
+     CACHED RFPs  (pre-scored baseline)
+  ══════════════════════════════════════════════ */
+  const CACHED_RFPS = [
+    {
+      id: 'rfp-001',
+      title: 'Water Pipeline Consulting Services',
+      agency: 'Lambton Area Water Supply',
+      bidNumber: 'LAWS-2025-014',
+      classification: 'Engineering / Environmental',
+      closingDate: '2025-06-10',
+      description: 'Consulting services for water pipeline condition assessment and capital planning.',
+      categories: ['Engineering', 'Environmental Services'],
+      sourceUrl: 'https://bids.bidsandtenders.ca/Module/Tenders/en/Tender/Detail/laws-2025-014',
+      estimatedValue: '$85,000',
+      capabilityMatch: 18,
+      winProbability: 12,
+      fitSummary: 'This RFP requires civil/environmental engineering expertise outside our IT services scope. We have no relevant certifications or past projects in water infrastructure.',
+      gaps: ['Civil engineering', 'Environmental assessment', 'Water infrastructure'],
+      readiness: 'hard',
+      confidence: 'high',
+      whyApply: 'No compelling reason — outside our core competency.'
+    },
+    {
+      id: 'rfp-002',
+      title: 'Fortinet Network Configuration & Support',
+      agency: 'Compass Community Services',
+      bidNumber: 'CCS-2025-IT-07',
+      classification: 'Information Technology',
+      closingDate: '2025-05-28',
+      description: 'Managed Fortinet FortiGate firewall deployment, SD-WAN configuration, and ongoing network support for a multi-site non-profit across 6 locations in Northern Ontario.',
+      categories: ['Information Technology', 'Network Infrastructure', 'Managed Services'],
+      sourceUrl: 'https://bids.bidsandtenders.ca/Module/Tenders/en/Tender/Detail/ccs-2025-it-07',
+      estimatedValue: '$62,000',
+      capabilityMatch: 97,
+      winProbability: 89,
+      fitSummary: 'Perfect alignment — Fortinet NSE-certified team with proven non-profit deployments in Northern Ontario. We completed near-identical work for Clearwater Township and have incumbent-level familiarity with this geography.',
+      gaps: [],
+      readiness: 'easy',
+      confidence: 'high',
+      whyApply: 'Exact match to our Fortinet expertise and Northern Ontario non-profit track record — highest win probability in current pipeline.'
+    },
+    {
+      id: 'rfp-003',
+      title: 'Door Replacement — École Vents-du-Nord',
+      agency: 'Conseil scolaire catholique Franco-Nord',
+      bidNumber: 'CSCFN-2025-031',
+      classification: 'Construction / Renovation',
+      closingDate: '2025-05-20',
+      description: 'Supply and installation of exterior and interior door replacements at a French-language elementary school.',
+      categories: ['Construction', 'Renovation', 'Facilities'],
+      sourceUrl: 'https://bids.bidsandtenders.ca/Module/Tenders/en/Tender/Detail/cscfn-2025-031',
+      estimatedValue: '$38,000',
+      capabilityMatch: 4,
+      winProbability: 2,
+      fitSummary: 'Construction/facilities trade work — entirely outside our IT services mandate. No relevant experience or certifications.',
+      gaps: ['Construction', 'Carpentry', 'Facilities management', 'Trade licenses'],
+      readiness: 'hard',
+      confidence: 'high',
+      whyApply: 'No reason to apply — this is a construction tender, not IT.'
+    },
+    {
+      id: 'rfp-004',
+      title: 'ERP Software Supply & Implementation',
+      agency: 'Rural Municipality of Corman Park',
+      bidNumber: 'RMCP-2025-ERP-02',
+      classification: 'Information Technology / Software',
+      closingDate: '2025-06-30',
+      description: 'Supply, implementation, training, and support for a municipal ERP financial and asset management system.',
+      categories: ['Information Technology', 'Software', 'ERP', 'Municipal'],
+      sourceUrl: 'https://bids.bidsandtenders.ca/Module/Tenders/en/Tender/Detail/rmcp-2025-erp-02',
+      estimatedValue: '$140,000',
+      capabilityMatch: 72,
+      winProbability: 58,
+      fitSummary: 'Strong match on ERP implementation and municipal context — our French River ERP project is a direct reference. Larger scope may favour larger vendors but our regional presence is a differentiator.',
+      gaps: ['Proprietary ERP licensing', 'Saskatchewan presence'],
+      readiness: 'medium',
+      confidence: 'medium',
+      whyApply: 'Directly parallels our French River ERP work — strong reference case and competitive positioning on regional expertise.'
+    },
+    {
+      id: 'rfp-005',
+      title: 'Laneway Houses Design & Construction',
+      agency: 'Community Land Trust of BC',
+      bidNumber: 'CLTB-2025-LH-09',
+      classification: 'Architecture / Construction',
+      closingDate: '2025-06-05',
+      description: 'Design and construction services for a pilot laneway housing project on community land trust properties.',
+      categories: ['Architecture', 'Construction', 'Housing'],
+      sourceUrl: 'https://bids.bidsandtenders.ca/Module/Tenders/en/Tender/Detail/cltb-2025-lh-09',
+      estimatedValue: '$290,000',
+      capabilityMatch: 3,
+      winProbability: 2,
+      fitSummary: 'Architecture and construction services — entirely outside IT scope. Wrong province and sector.',
+      gaps: ['Architecture', 'Construction', 'Residential design', 'BC presence'],
+      readiness: 'hard',
+      confidence: 'high',
+      whyApply: 'No reason to apply — construction/architecture in BC, not IT in Ontario.'
+    }
+  ];
+
+  /* ══════════════════════════════════════════════
+     STATE
+  ══════════════════════════════════════════════ */
+  const state = {
+    authed:        false,
+    onboarded:     false,
+    vendorProfile: null,
+    previousBids:  [],
+    liveRfps:      [],
+    rfpsFetched:   false,
+    lastFetchTime: null,
+    activeDraft:   null,
+    activeRfp:     null,
+  };
+
+  let obDocCount = 1;
+
+  /* ══════════════════════════════════════════════
+     LOCAL STORAGE HELPERS
+  ══════════════════════════════════════════════ */
+  function getSeenUrls() {
+    try { return JSON.parse(localStorage.getItem('bm_seen_urls') || '[]'); } catch (_) { return []; }
+  }
+  function addSeenUrls(urls) {
+    try {
+      const seen = new Set(getSeenUrls());
+      urls.forEach(u => seen.add(u));
+      localStorage.setItem('bm_seen_urls', JSON.stringify([...seen]));
+    } catch (_) {}
+  }
+  function getLastCheckDate() {
+    return localStorage.getItem('bm_last_check') || null;
+  }
+  function setLastCheckDate(dateStr) {
+    try { localStorage.setItem('bm_last_check', dateStr); } catch (_) {}
+  }
+
+  /* ══════════════════════════════════════════════
+     SESSION PERSISTENCE
+  ══════════════════════════════════════════════ */
+  function saveSession() {
+    try {
+      sessionStorage.setItem('bm_auth',    '1');
+      if (state.vendorProfile) sessionStorage.setItem('bm_profile', JSON.stringify(state.vendorProfile));
+      if (state.previousBids.length) sessionStorage.setItem('bm_bids', JSON.stringify(state.previousBids));
+      if (state.liveRfps.length)     sessionStorage.setItem('bm_rfps', JSON.stringify(state.liveRfps));
+      sessionStorage.setItem('bm_fetched', state.rfpsFetched ? '1' : '0');
+      if (state.lastFetchTime) sessionStorage.setItem('bm_fetch_ts', state.lastFetchTime);
+    } catch (_) {}
+  }
+
+  function loadSession() {
+    try {
+      const p  = sessionStorage.getItem('bm_profile');
+      const b  = sessionStorage.getItem('bm_bids');
+      const r  = sessionStorage.getItem('bm_rfps');
+      const ts = sessionStorage.getItem('bm_fetch_ts');
+      if (p) { state.vendorProfile = JSON.parse(p); state.onboarded = true; }
+      if (b) state.previousBids = JSON.parse(b);
+      if (r) state.liveRfps     = JSON.parse(r);
+      state.rfpsFetched = sessionStorage.getItem('bm_fetched') === '1';
+      if (ts) state.lastFetchTime = ts;
+    } catch (_) {}
+  }
+
+  /* ══════════════════════════════════════════════
+     API HELPER
+  ══════════════════════════════════════════════ */
+  async function callClaude(systemPrompt, userMessage, useWebSearch = false, maxTokens = 2000) {
+    const body = {
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: maxTokens,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userMessage }]
+    };
+    if (useWebSearch) {
+      body.tools = [{ type: 'web_search_20250305', name: 'web_search' }];
+    }
+    const response = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!response.ok) {
+      const err = await response.text();
+      throw new Error(`API error ${response.status}: ${err}`);
+    }
+    const data = await response.json();
+    // Extract text from content blocks (handles tool_use interleaved responses)
+    const text = data.content
+      .filter(block => block.type === 'text')
+      .map(block => block.text)
+      .join('');
+    // Strip markdown code fences if present
+    return text.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim();
+  }
+
+  function parseJsonArray(result) {
+    const jsonMatch = result.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) throw new Error('No JSON array found in response');
+    return JSON.parse(jsonMatch[0]);
+  }
+
+  function parseJsonObject(result) {
+    const m = result.match(/\{[\s\S]*\}/);
+    if (!m) throw new Error('No JSON object found in response');
+    return JSON.parse(m[0]);
+  }
+
+  /* ══════════════════════════════════════════════
+     HELPERS
+  ══════════════════════════════════════════════ */
+  function esc(s) {
+    if (s == null) return '';
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function trunc(s, n) { return s && s.length > n ? s.slice(0, n) + '…' : (s || ''); }
+
+  function isClosingSoon(d) {
+    if (!d) return false;
+    const diff = (new Date(d) - Date.now()) / 86400000;
+    return diff >= 0 && diff <= 7;
+  }
+
+  function scoreCls(v) {
+    if (v >= 75) return 'sc-green';
+    if (v >= 50) return 'sc-amber';
+    return 'sc-red';
+  }
+
+  function circCls(v) {
+    if (v >= 60) return 'mc-green';
+    if (v >= 40) return 'mc-amber';
+    return 'mc-red';
+  }
+
+  function showLoading(t) {
+    document.getElementById('loading-text').textContent = t;
+    document.getElementById('loading').classList.add('active');
+  }
+
+  function hideLoading() {
+    document.getElementById('loading').classList.remove('active');
+  }
+
+  function fmtTime(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  /* ══════════════════════════════════════════════
+     ENTER APP
+  ══════════════════════════════════════════════ */
+  function enterApp() {
+    document.getElementById('main-page').classList.add('active');
+    renderBidsTable();
+    initRfps();
+  }
+
+  /* ══════════════════════════════════════════════
+     RFP CACHING SYSTEM
+  ══════════════════════════════════════════════ */
+  async function fetchNewRfpUrls(seenUrls) {
+    const seenSet = new Set(seenUrls);
+    try {
+      const raw = await callClaude(
+        `Search for currently open RFP opportunities on the Bids and Tenders website (bids.bidsandtenders.ca).
+Find detail page URLs for currently open bid opportunities.
+Return ONLY a valid JSON array of URL strings, no markdown, no explanation.`,
+        `Find currently open RFP listings on https://bids.bidsandtenders.ca/Module/Tenders/en/Home/BidsHomepage
+Return an array of 8-10 detail page URLs for open bids.`,
+        true
+      );
+      const allUrls = parseJsonArray(raw);
+      return allUrls.filter(u => !seenSet.has(u));
+    } catch (_) {
+      return FALLBACK_URLS.filter(u => !seenSet.has(u));
+    }
+  }
+
+  async function scoreRfps(urls) {
+    if (!urls.length) return [];
+    const raw = await callClaude(
+      `YOU MUST RESPOND WITH ONLY A JSON ARRAY. NO TEXT BEFORE OR AFTER. NO EXPLANATION. NO PREAMBLE.
+
+For each URL: fetch the full page content and extract all RFP details.
+Score each RFP against the vendor profile.
+
+Return a JSON array sorted by winProbability descending. Each element:
+{
+  "id": string,
+  "title": string,
+  "agency": string,
+  "bidNumber": string,
+  "classification": string,
+  "closingDate": string,
+  "description": string,
+  "categories": string[],
+  "sourceUrl": string,
+  "estimatedValue": string or null,
+  "capabilityMatch": number 0-100,
+  "winProbability": number 0-100,
+  "fitSummary": string (2 sentences),
+  "gaps": string[],
+  "readiness": "easy"|"medium"|"hard",
+  "confidence": "high"|"medium"|"low",
+  "whyApply": string (1 sentence — the strongest reason to bid on this)
+}
+Set confidence to "low" if the page had minimal description text.`,
+      `Vendor Profile:
+${JSON.stringify(state.vendorProfile, null, 2)}
+
+Previous Bid Keywords:
+${state.previousBids.map(b => b.keywords.join(', ')).join(' | ')}
+
+RFP URLs:
+${urls.join('\n')}`,
+      true,
+      4000
+    );
+    const jsonMatch = raw.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) return [];
+    return JSON.parse(jsonMatch[0]);
+  }
+
+  async function loadRfps() {
+    // Render immediately with cached data
+    renderRecommendations();
+
+    // Daily background check — skip if already ran today
+    const today = new Date().toISOString().slice(0, 10);
+    if (getLastCheckDate() === today) return;
+
+    showRefreshingBanner();
+    try {
+      const seenUrls = getSeenUrls();
+      const newUrls  = await fetchNewRfpUrls(seenUrls);
+      if (newUrls.length > 0) {
+        addSeenUrls(newUrls);
+        const newRfps = await scoreRfps(newUrls);
+        if (newRfps.length > 0) {
+          const existingIds = new Set(state.liveRfps.map(r => r.id));
+          const toAdd = newRfps.filter(r => !existingIds.has(r.id));
+          state.liveRfps = [...toAdd, ...state.liveRfps]
+            .sort((a, b) => (b.winProbability || 0) - (a.winProbability || 0));
+          try {
+            const extras = state.liveRfps.filter(r => !CACHED_RFPS.find(c => c.id === r.id));
+            localStorage.setItem('bm_extra_rfps', JSON.stringify(extras));
+          } catch (_) {}
+          renderRecommendations();
+        }
+      }
+      setLastCheckDate(today);
+    } catch (_) {}
+    hideRefreshingBanner();
+    updateLastUpdatedLabel('checked');
+  }
+
+  function initRfps() {
+    // Merge CACHED_RFPS + any localStorage extras from previous checks
+    let extras = [];
+    try { extras = JSON.parse(localStorage.getItem('bm_extra_rfps') || '[]'); } catch (_) {}
+    const extraIds = new Set(extras.map(r => r.id));
+    state.liveRfps = [
+      ...extras,
+      ...CACHED_RFPS.filter(r => !extraIds.has(r.id))
+    ].sort((a, b) => (b.winProbability || 0) - (a.winProbability || 0));
+    loadRfps();
+  }
+
+  function showRefreshingBanner() {
+    let banner = document.getElementById('refreshing-banner');
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'refreshing-banner';
+      banner.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#2E7D6B;color:#fff;padding:10px 16px;border-radius:6px;font-size:13px;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,.2);';
+      document.body.appendChild(banner);
+    }
+    banner.textContent = '↻ Checking for new opportunities…';
+    banner.style.display = 'block';
+  }
+
+  function hideRefreshingBanner() {
+    const banner = document.getElementById('refreshing-banner');
+    if (banner) banner.style.display = 'none';
+  }
+
+  function updateLastUpdatedLabel(status) {
+    const el = document.getElementById('last-updated-txt');
+    if (!el) return;
+    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    el.textContent = status === 'checked' ? `Last checked: ${timeStr}` : `Last updated: ${timeStr}`;
+  }
+
+  function renderRecommendations() {
+    renderAiTable();
+  }
+
+  /* ══════════════════════════════════════════════
+     AI SECTION — SKELETON LOADERS
+  ══════════════════════════════════════════════ */
+  function renderAiSkeletons() {
+    const skRow = () => `
+      <tr class="skel-row">
+        <td><div class="skeleton" style="height:13px;width:200px;margin-bottom:5px;"></div>
+            <div class="skeleton" style="height:10px;width:140px;"></div></td>
+        <td><div class="skeleton" style="height:22px;width:44px;"></div></td>
+        <td><div class="skeleton" style="height:12px;width:180px;"></div></td>
+        <td><div class="skeleton" style="height:12px;width:80px;"></div></td>
+        <td><div class="skeleton" style="height:24px;width:90px;"></div></td>
+      </tr>`;
+    document.getElementById('ai-body').innerHTML = `
+      <table class="ai-table">
+        <thead>
+          <tr>
+            <th>Opportunity</th><th>Match Score</th>
+            <th>Win Signal</th><th>Closing</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>${skRow()}${skRow()}${skRow()}</tbody>
+      </table>`;
+    document.getElementById('last-updated-txt').textContent = '';
+  }
+
+  /* ══════════════════════════════════════════════
+     AI SECTION — RESULTS TABLE
+  ══════════════════════════════════════════════ */
+  function renderAiTable() {
+    if (state.lastFetchTime) {
+      document.getElementById('last-updated-txt').textContent = 'Last updated: ' + fmtTime(state.lastFetchTime);
+    }
+
+    if (!state.liveRfps || state.liveRfps.length === 0) {
+      document.getElementById('ai-body').innerHTML = `
+        <div class="ai-empty">
+          <p style="margin-bottom:10px;">Could not load live opportunities. Check your connection or try refreshing.</p>
+          <button class="btn-teal-sm" id="retry-ai-btn">Try again</button>
+        </div>`;
+      document.getElementById('retry-ai-btn').addEventListener('click', () => {
+        localStorage.removeItem('bm_last_check');
+        renderAiSkeletons();
+        loadRfps();
+      });
+      return;
+    }
+
+    const top5 = state.liveRfps.slice(0, 5);
+    const rows = top5.map(rfp => {
+      const sc     = rfp.winProbability != null ? rfp.winProbability : (rfp.capabilityMatch || 0);
+      const cls    = scoreCls(sc);
+      const signal = esc(trunc(rfp.whyApply || rfp.fitSummary || '—', 80));
+      const urgent = isClosingSoon(rfp.closingDate);
+      const dtCls  = urgent ? 'close-date urgent' : 'close-date';
+      const dtTxt  = rfp.closingDate ? (urgent ? '⚠ ' : '') + esc(rfp.closingDate) : '—';
+
+      return `
+        <tr>
+          <td>
+            <button class="opp-name-link" data-id="${esc(rfp.id)}">${esc(rfp.title || 'Untitled')}</button>
+            <div class="opp-agency">${esc(rfp.agency || '')}</div>
+            <div class="opp-bidnum">${esc(rfp.bidNumber || '')}</div>
+          </td>
+          <td style="text-align:center; white-space:nowrap;">
+            <span class="score-large ${cls}">${sc}%</span>
+            <span class="score-lbl">match</span>
+          </td>
+          <td><span class="win-signal">${signal}</span></td>
+          <td><span class="${dtCls}">${dtTxt}</span></td>
+          <td style="white-space:nowrap;">
+            <button class="btn-teal-sm easy-apply-btn" data-id="${esc(rfp.id)}" style="margin-bottom:4px;">Easy Apply</button>
+            ${rfp.sourceUrl ? `<br><a href="${encodeURI(rfp.sourceUrl)}" target="_blank" rel="noopener" style="font-size:12px;color:#2E7D6B;">View ↗</a>` : ''}
+          </td>
+        </tr>`;
+    }).join('');
+
+    document.getElementById('ai-body').innerHTML = `
+      <table class="ai-table">
+        <thead>
+          <tr>
+            <th>Opportunity</th><th>Match Score</th>
+            <th>Win Signal</th><th>Closing</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+
+    // Wire buttons
+    document.querySelectorAll('.easy-apply-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const rfp = state.liveRfps.find(r => r.id === btn.dataset.id);
+        if (rfp) openEasyApply(rfp);
+      });
+    });
+    document.querySelectorAll('.opp-name-link').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const rfp = state.liveRfps.find(r => r.id === btn.dataset.id);
+        if (rfp) openEasyApply(rfp);
+      });
+    });
+  }
+
+  /* ══════════════════════════════════════════════
+     REFRESH BUTTON
+  ══════════════════════════════════════════════ */
+  document.getElementById('refresh-ai-btn').addEventListener('click', () => {
+    localStorage.removeItem('bm_last_check');
+    renderAiSkeletons();
+    loadRfps();
+  });
+
+  /* ══════════════════════════════════════════════
+     BID SUBMISSION HISTORY TABLE
+  ══════════════════════════════════════════════ */
+  function renderBidsTable() {
+    const wrap = document.getElementById('bids-table-wrap');
+    if (!state.previousBids.length) {
+      wrap.innerHTML = '<p style="color:#555;font-size:13px;">No bid submissions on file.</p>';
+      return;
+    }
+
+    const opMap = { won: 'op-won', lost: 'op-lost', submitted: 'op-submitted', pending: 'op-pending' };
+    const opLbl = { won: 'Won', lost: 'Lost', submitted: 'Submitted', pending: 'Pending' };
+
+    const headerRow = `
+      <tr>
+        <th>Bid Name</th><th>Agency</th>
+        <th>Date Submitted</th><th>Value</th>
+        <th>Outcome</th><th>Actions</th>
+      </tr>`;
+
+    const bodyRows = state.previousBids.map(bid => {
+      const oc  = opMap[bid.outcome] || 'op-submitted';
+      const ol  = opLbl[bid.outcome] || 'Submitted';
+      const kws = (bid.keywords || []).map(k => `<span class="kw">${esc(k)}</span>`).join(' ');
+
+      return `
+        <tr>
+          <td>
+            <button class="bid-link" data-id="${esc(bid.id)}">${esc(bid.title)}</button>
+          </td>
+          <td>${esc(bid.agency || '—')}</td>
+          <td>${esc(bid.date   || '—')}</td>
+          <td>${esc(bid.value  || '—')}</td>
+          <td><span class="opill ${oc}">${ol}</span></td>
+          <td>
+            <button class="btn-outline-sm use-tmpl-btn" data-id="${esc(bid.id)}">Use as template</button>
+          </td>
+        </tr>
+        <tr class="detail-row" id="detail-${esc(bid.id)}">
+          <td class="detail-cell" colspan="6">
+            <p class="detail-summary">${esc(bid.summary || bid.docText || '')}</p>
+            <div class="kw-wrap">${kws}</div>
+          </td>
+        </tr>`;
+    }).join('');
+
+    wrap.innerHTML = `<table class="data-table"><thead>${headerRow}</thead><tbody>${bodyRows}</tbody></table>`;
+
+    // Toggle detail rows
+    wrap.querySelectorAll('.bid-link').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const row = document.getElementById('detail-' + btn.dataset.id);
+        if (row) row.classList.toggle('open');
+      });
+    });
+
+    // Use as template
+    wrap.querySelectorAll('.use-tmpl-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (state.liveRfps.length > 0) {
+          openEasyApply(state.liveRfps[0], btn.dataset.id);
+        } else {
+          alert('Score some opportunities first, then use this bid as a template.');
+        }
+      });
+    });
+  }
+
+  /* ══════════════════════════════════════════════
+     UPLOAD BID MODAL
+  ══════════════════════════════════════════════ */
+  document.getElementById('add-bid-btn').addEventListener('click', () => {
+    document.getElementById('upload-text').value  = '';
+    document.getElementById('upload-error').textContent = '';
+    document.getElementById('upload-modal').classList.add('active');
+  });
+  document.getElementById('upload-close-btn').addEventListener('click', () => {
+    document.getElementById('upload-modal').classList.remove('active');
+  });
+  document.getElementById('upload-cancel-btn').addEventListener('click', () => {
+    document.getElementById('upload-modal').classList.remove('active');
+  });
+
+  document.getElementById('upload-submit-btn').addEventListener('click', async () => {
+    const txt   = document.getElementById('upload-text').value.trim();
+    const errEl = document.getElementById('upload-error');
+    if (!txt) { errEl.textContent = 'Please paste a bid document.'; return; }
+    errEl.textContent = '';
+
+    showLoading('Processing bid document…');
+    try {
+      const raw = await callClaude(
+        `Extract metadata from this bid document. Return ONLY valid JSON.
+Schema: { "title": string, "agency": string, "date": string (YYYY-MM-DD or empty), "value": string, "outcome": "submitted", "summary": string, "keywords": string[] }`,
+        txt, false
+      );
+      const meta = parseJsonObject(raw);
+      state.previousBids.push({
+        id: 'bid-up-' + Date.now(),
+        title:    meta.title    || 'Uploaded Bid',
+        agency:   meta.agency   || '',
+        date:     meta.date     || new Date().toISOString().slice(0,10),
+        value:    meta.value    || '',
+        outcome:  'submitted',
+        summary:  meta.summary  || '',
+        keywords: meta.keywords || [],
+        docText:  txt,
+      });
+      saveSession();
+      hideLoading();
+      document.getElementById('upload-modal').classList.remove('active');
+      renderBidsTable();
+    } catch (err) {
+      hideLoading();
+      errEl.textContent = 'Error: ' + err.message;
+    }
+  });
+
+  /* ══════════════════════════════════════════════
+     EASY APPLY MODAL
+  ══════════════════════════════════════════════ */
+  function openEasyApply(rfp, preSelectBidId) {
+    state.activeRfp   = rfp;
+    state.activeDraft = null;
+
+    document.getElementById('ea-heading').textContent = trunc(rfp.title || 'RFP', 50);
+    document.getElementById('ea-title').textContent   = rfp.title || 'Untitled RFP';
+    document.getElementById('ea-meta').textContent    = [rfp.agency, rfp.bidNumber, rfp.closingDate].filter(Boolean).join(' · ');
+    document.getElementById('ea-desc').textContent    = rfp.description || 'No description available.';
+
+    // Metric circles
+    const wv = rfp.winProbability  != null ? rfp.winProbability  + '%' : '—';
+    const cv = rfp.capabilityMatch != null ? rfp.capabilityMatch + '%' : '—';
+    const wc = document.getElementById('ea-win-circle');
+    const cc = document.getElementById('ea-cap-circle');
+    wc.className = 'metric-circ ' + circCls(rfp.winProbability  || 0);
+    cc.className = 'metric-circ ' + circCls(rfp.capabilityMatch || 0);
+    document.getElementById('ea-win-val').textContent = wv;
+    document.getElementById('ea-cap-val').textContent = cv;
+
+    // Pills
+    const pills = [];
+    if (rfp.classification) pills.push(`<span style="background:#eeeeee;padding:2px 8px;font-size:11px;border-radius:2px;">${esc(rfp.classification)}</span>`);
+    if (rfp.readiness) {
+      const rc = rfp.readiness === 'easy' ? '#d6ede8' : rfp.readiness === 'medium' ? '#fff8e1' : '#fde8e6';
+      const rt = rfp.readiness === 'easy' ? '#1B5E50' : rfp.readiness === 'medium' ? '#E6950A' : '#C0392B';
+      pills.push(`<span style="background:${rc};color:${rt};padding:2px 8px;font-size:11px;border-radius:2px;font-weight:bold;">${esc(rfp.readiness)}</span>`);
+    }
+    document.getElementById('ea-pills').innerHTML = `<div style="display:flex;gap:6px;flex-wrap:wrap;">${pills.join('')}</div>`;
+
+    // Source link
+    const srcLink = document.getElementById('ea-source-link');
+    if (rfp.sourceUrl) {
+      srcLink.href  = rfp.sourceUrl;
+      srcLink.style.display = '';
+    } else {
+      srcLink.style.display = 'none';
+    }
+
+    // Populate bid dropdown
+    const sel = document.getElementById('draft-base-sel');
+    sel.innerHTML = `<option value="">Start fresh</option>` +
+      state.previousBids.map(b => `<option value="${esc(b.id)}">${esc(b.title)}</option>`).join('');
+    if (preSelectBidId) sel.value = preSelectBidId;
+
+    // Reset draft area
+    document.getElementById('draft-form').style.display = 'block';
+    document.getElementById('draft-box').classList.remove('active');
+    document.getElementById('draft-spinner').classList.remove('active');
+    document.getElementById('draft-error').textContent = '';
+    document.getElementById('draft-instr').value =
+      'Generate a bid submission draft for this RFP based on my previous experience.';
+
+    document.getElementById('ea-modal').classList.add('active');
+  }
+
+  document.getElementById('ea-close-btn').addEventListener('click', () => {
+    document.getElementById('ea-modal').classList.remove('active');
+  });
+
+  document.getElementById('gen-draft-btn').addEventListener('click', async () => {
+    const rfp         = state.activeRfp;
+    const selId       = document.getElementById('draft-base-sel').value;
+    const instr       = document.getElementById('draft-instr').value.trim();
+    const baseBid     = state.previousBids.find(b => b.id === selId) || null;
+    const errEl       = document.getElementById('draft-error');
+
+    errEl.textContent = '';
+    document.getElementById('draft-form').style.display = 'none';
+    document.getElementById('draft-spinner').classList.add('active');
+    document.getElementById('draft-box').classList.remove('active');
+
+    try {
+      const raw = await callClaude(
+        `You are an expert bid writer helping a vendor prepare a proposal.
+Generate a professional, detailed bid submission draft based on:
+1. The vendor's profile and capabilities
+2. The selected previous bid (if any) as a style/content reference
+3. The specific requirements of the target RFP
+
+Structure the draft with these sections:
+- Executive Summary
+- Understanding of Requirements
+- Proposed Approach
+- Relevant Experience
+- Team Qualifications
+- Pricing Notes (placeholder)
+- Why Choose Us
+
+Write in a professional tone appropriate for municipal government procurement.
+Be specific — reference actual capabilities, certifications, and experience from the vendor profile.`,
+        `Vendor Profile:
+${JSON.stringify(state.vendorProfile, null, 2)}
+
+${baseBid ? `Reference Bid (use as style template):\n${baseBid.docText}\n\n` : ''}Target RFP:
+Title: ${rfp.title}
+Agency: ${rfp.agency}
+Description: ${rfp.description}
+Categories: ${(rfp.categories||[]).join(', ')}
+
+Additional instructions: ${instr}`,
+        false, 4000
+      );
+
+      state.activeDraft = raw;
+      document.getElementById('draft-text').textContent = raw;
+      document.getElementById('draft-spinner').classList.remove('active');
+      document.getElementById('draft-box').classList.add('active');
+    } catch (err) {
+      document.getElementById('draft-spinner').classList.remove('active');
+      document.getElementById('draft-form').style.display = 'block';
+      errEl.textContent = 'Error generating draft: ' + err.message;
+    }
+  });
+
+  document.getElementById('regen-btn').addEventListener('click', () => {
+    document.getElementById('draft-box').classList.remove('active');
+    document.getElementById('draft-form').style.display = 'block';
+  });
+
+  document.getElementById('copy-draft-btn').addEventListener('click', () => {
+    if (!state.activeDraft) return;
+    navigator.clipboard.writeText(state.activeDraft).then(() => {
+      const b = document.getElementById('copy-draft-btn');
+      b.textContent = 'Copied!';
+      setTimeout(() => { b.textContent = 'Copy to clipboard'; }, 2000);
+    }).catch(() => alert('Copy failed — please select and copy manually.'));
+  });
+
+  document.getElementById('download-draft-btn').addEventListener('click', () => {
+    if (!state.activeDraft || !state.activeRfp) return;
+    const blob = new Blob([state.activeDraft], { type: 'text/plain' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `bid-draft-${(state.activeRfp.title||'rfp').toLowerCase().replace(/\s+/g,'-').slice(0,40)}.txt`;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+  });
+
+  /* ══════════════════════════════════════════════
+     INIT
+  ══════════════════════════════════════════════ */
+  function loadProfile() {
+    state.vendorProfile = {
+      companyName: "Nexus Technology Solutions Inc.",
+      industry: "Information Technology Services",
+      description: "Sudbury-based IT services firm with 12 years of experience delivering managed IT, network infrastructure, and cybersecurity solutions to municipal governments, non-profits, and healthcare agencies across Northern and Central Ontario.",
+      capabilities: ["Network infrastructure", "Fortinet deployment", "Microsoft 365 migration", "Cybersecurity assessment", "ERP implementation", "Managed IT services", "Cloud migration", "IT strategic planning"],
+      categories: ["Information Technology", "Consulting Services", "Cybersecurity", "Cloud Services"],
+      avgProjectSize: "$55,000",
+      geography: ["Northern Ontario", "Sudbury", "North Bay", "Nipissing", "Timiskaming", "Parry Sound"],
+      certs: ["Fortinet NSE 4", "Fortinet NSE 5", "Microsoft AZ-104", "MS-102", "CISSP", "CompTIA Security+", "Cisco CCNA"],
+      summary: "Northern Ontario IT firm specializing in municipal and non-profit technology projects including Fortinet network deployments, Microsoft 365 migrations, cybersecurity assessments, and ERP implementations.",
+      strengthKeywords: ["Fortinet", "Microsoft 365", "municipal", "cybersecurity", "ERP", "cloud migration", "Northern Ontario"]
+    };
+    state.previousBids = SAMPLE_BIDS;
+    state.onboarded = true;
+  }
+
+  (function init() {
+    // Wire password gate
+    const pwBtn   = document.getElementById('pw-btn');
+    const pwInput = document.getElementById('pw-input');
+    const pwError = document.getElementById('pw-error');
+    const gate    = document.getElementById('gate');
+
+    function tryLogin() {
+      if (pwInput.value === CORRECT_PASSWORD) {
+        try { sessionStorage.setItem('bm_auth', '1'); } catch (_) {}
+        gate.classList.add('hidden');
+        loadProfile();
+        enterApp();
+      } else {
+        pwError.textContent = 'Incorrect password.';
+        pwInput.value = '';
+        pwInput.focus();
+      }
+    }
+
+    pwBtn.addEventListener('click', tryLogin);
+    pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+
+    // Skip gate if already authed this session
+    if (sessionStorage.getItem('bm_auth') === '1') {
+      gate.classList.add('hidden');
+      loadProfile();
+      enterApp();
+    } else {
+      pwInput.focus();
+    }
+  })();
+</script>
+</body>
+</html>
